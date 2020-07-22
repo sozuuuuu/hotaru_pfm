@@ -199,6 +199,7 @@ GEM
       mini_portile2 (~> 2.4.0)
     parser (2.7.0.5)
       ast (~> 2.4.0)
+    pg (1.2.3)
     procto (0.0.3)
     public_suffix (4.0.5)
     puma (4.3.5)
@@ -303,7 +304,6 @@ GEM
       actionpack (>= 4.0)
       activesupport (>= 4.0)
       sprockets (>= 3.0.0)
-    sqlite3 (1.4.2)
     thor (1.0.1)
     thread_safe (0.3.6)
     tilt (2.0.10)
@@ -356,6 +356,7 @@ DEPENDENCIES
   listen (~> 3.2)
   mutant-license!
   mutant-minitest!
+  pg
   puma (~> 4.1)
   rails (~> 6.0.3, >= 6.0.3.1)
   rails_event_store (~> 1.0.0)
@@ -366,7 +367,6 @@ DEPENDENCIES
   skylight
   spring
   spring-watcher-listen (~> 2.0.0)
-  sqlite3 (~> 1.4)
   turbolinks (~> 5)
   tzinfo-data
   web-console (>= 3.3.0)
