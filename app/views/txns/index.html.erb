@@ -1,0 +1,45 @@
+<p id="notice"><%= notice %></p>
+
+<h1>Transactions</h1>
+
+<h2>Dashboard</h2>
+Your monthly spending:<br />
+<% @monthly_spending.each do |s| %>
+  date: <%= s[:date] %>, amount: <%= s[:amount] %><br />
+<% end %>
+
+<h2>List</h2>
+
+<table class="table">
+  <thead>
+  <tr>
+    <th>Datetime</th>
+    <th>Description</th>
+    <th>Amount</th>
+    <th>From</th>
+    <th>To</th>
+  </tr>
+  </thead>
+
+  <tbody>
+  <% @txns.each do |txn| %>
+    <tr>
+      <td><%= txn.datetime %></td>
+      <td><%= txn.description %></td>
+      <td><%= txn.amount %></td>
+      <td><%= txn.account_from %></td>
+      <td><%= txn.account_to %></td>
+    </tr>
+  <% end %>
+  </tbody>
+</table>
+
+<br>
+
+<%= link_to 'New txn', new_txn_path, class: "btn btn-primary" %>
+<!--<br/>-->
+<!--<p>Simulate backgound worker, push-->
+  <%#= link_to 'Expire', expire_txns_path, class: "btn", method: :post %>
+<!--  to start txns expiration</p>-->
+
+

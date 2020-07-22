@@ -1,0 +1,23 @@
+<h1>New txn</h1>
+
+<%= form_tag({controller: "txns", action: "create"}, method: "post") do %>
+  <%= hidden_field_tag(:transaction_id, @txn_id) %>
+
+  <%= label_tag :amount %>
+  <%= number_field_tag :amount, 0 %>
+
+  <%= label_tag :description %>
+  <%= text_field_tag :description %>
+
+  <%= label_tag :account_from %>
+  <%= text_field_tag :account_from %>
+
+  <%= label_tag :account_to %>
+  <%= text_field_tag :account_to %>
+
+  <%= label_tag :datetime %>
+  <%= date_field_tag :datetime %>
+
+  <%= submit_tag("Submit txn", class: "btn btn-primary") %>
+  <%= link_to 'Back', txns_path, class: "btn btn-default" %>
+<% end %>

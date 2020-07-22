@@ -2,6 +2,8 @@ require 'rails_event_store'
 require 'aggregate_root'
 require 'arkency/command_bus'
 
+require 'pfm/pfm'
+
 Rails.configuration.to_prepare do
   Rails.configuration.event_store = RailsEventStore::Client.new
   Rails.configuration.command_bus = Arkency::CommandBus.new
@@ -22,4 +24,16 @@ Rails.configuration.to_prepare do
   #   bus.register(PrintInvoice, Invoicing::OnPrint.new)
   #   bus.register(SubmitOrder,  ->(cmd) { Ordering::OnSubmitOrder.new.call(cmd) })
   # end
+
+  unless Rails.env.test?
+    Rails.configuration.event_store.tap do |store|
+      store.subscribe(Query::UpdateMonthlySpending, to: [PFM::TransactionAdded])
+      store.subscribe(Query::CreateTransactionView, to: [PFM::TransactionAdded])
+    end
+
+    Rails.configuration.command_bus.tap do |bus|
+      bus.register(PFM::AddAccount, PFM::OnAddAccount.new)
+      bus.register(PFM::AddTransaction, PFM::OnAddTransaction.new)
+    end
+  end
 end

@@ -48,9 +48,17 @@ group :test do
   gem 'selenium-webdriver'
   # Easy installation and use of web drivers to run system tests with browsers
   gem 'webdrivers'
+  gem 'simplecov', require: false
+  gem 'mutant-minitest', github: 'mbj/mutant', ref: '027b3d8f7508fe4e460ed999dd91f2ac3edd136b'
+  gem 'mutant-license',  source: 'https://oss:7AXfeZdAfCqL1PvHm2nvDJO6Zd9UW8IK@gem.mutant.dev'
 end
 
 # Windows does not include zoneinfo files, so bundle the tzinfo-data gem
 gem 'tzinfo-data', platforms: [:mingw, :mswin, :x64_mingw, :jruby]
 
 gem 'rails_event_store', '~> 1.0.0'
+gem 'dry-struct'
+gem 'dry-types'
+gem 'dry-schema'
+gem 'skylight'
+gem 'redis-objects'
