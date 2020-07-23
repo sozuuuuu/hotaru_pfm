@@ -4,7 +4,7 @@ module PFM
 
     def initialize(id)
       @id = id
-      @amount = 0.0
+      @amount = Money.new(amount: 0.0)
     end
 
     def add(amount, description, account_from, account_to, datetime)
@@ -17,7 +17,7 @@ module PFM
     end
 
     on TransactionAdded do |event|
-      @amount = event.data[:amount]
+      @amount = Money.new(amount: event.data[:amount])
       @description = event.data[:description]
       @account_from = event.data[:account_from]
       @account_to = event.data[:account_to]
