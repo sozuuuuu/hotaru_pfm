@@ -2,15 +2,15 @@ require_relative './test_helper'
 
 module PFM
   class AddTransactionTest < ActiveSupport::TestCase
-    include TestCase
-
-    # What is this?
-    cover 'PFM::AddTransaction*'
-
     setup do
-      Rails.configuration.command_bus.tap do |bus|
-        bus.register(PFM::AddTransaction, PFM::OnAddTransaction.new)
-      end
+      @event_store = RailsEventStore::Client.new(
+        repository: RubyEventStore::InMemoryRepository.new
+      )
+      @command_bus = Arkency::CommandBus.new
+      @command_bus.register(
+        PFM::AddTransaction,
+        PFM::OnAddTransaction.new(@event_store)
+      )
     end
 
     test 'transaction is added' do
@@ -26,7 +26,11 @@ module PFM
                                    account_from: acc_x,
                                    account_to: acc_y)
 
-      published_events = act(stream, command)
+      before = @event_store.read.stream(stream).each.to_a
+      @command_bus.(command)
+      after = @event_store.read.stream(stream).each.to_a
+      published_events = after.reject { |a| before.any? { |b| a.event_id == b.event_id } }
+
       assert_equal(1, published_events.length)
 
       event = published_events.first

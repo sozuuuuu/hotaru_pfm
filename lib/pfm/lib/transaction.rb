@@ -1,10 +1,11 @@
+require 'money'
+
 module PFM
   class Transaction
-    include AggregateRoot
-
-    def initialize(id)
+    def initialize(id, event_store:)
       @id = id
       @amount = Money.new(amount: 0.0)
+      @event_store = event_store
     end
 
     def add(amount, description, account_from, account_to, datetime)
@@ -13,15 +14,26 @@ module PFM
                                          description: description,
                                          account_from: account_from,
                                          account_to: account_to,
-                                         datetime: datetime})
+                                         datetime: datetime })
     end
 
-    on TransactionAdded do |event|
-      @amount = Money.new(amount: event.data[:amount])
-      @description = event.data[:description]
-      @account_from = event.data[:account_from]
-      @account_to = event.data[:account_to]
-      @datetime = event.data[:datetime]
+    class UnhandledEventError < StandardError; end
+
+    def apply(event)
+      case event
+      when TransactionAdded
+        on_transaction_added(event)
+      else
+        raise UnhandledEventError, event
+      end
+
+      @event_store.publish(event, stream_name: stream_name)
     end
+
+    def stream_name
+      "#{self.class}$#{@id}"
+    end
+
+    def on_transaction_added(_event); end
   end
 end
