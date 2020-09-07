@@ -8,12 +8,16 @@ module PFM
 
     def with_aggregate(aggregate_class, aggregate_id, &block)
       # repository = AggregateRoot::InstrumentedRepository.new(AggregateRoot::Repository.new(Rails.configuration.event_store), ActiveSupport::Notifications)
+      version = -1
       aggregate = aggregate_class.new(aggregate_id)
       stream = stream_name(aggregate_class, aggregate_id)
       events = @event_store.read.stream(stream).to_a
-      events.each { |event| aggregate.apply(event) }
+      events.each do |event|
+        aggregate.apply(event)
+        version += 1
+      end
       new_event = block.call(aggregate)
-      @event_store.publish(new_event, stream_name: stream_name(aggregate_class, aggregate_id))
+      @event_store.publish(new_event, stream_name: stream_name(aggregate_class, aggregate_id), expected_version: version)
     end
 
     # def rehydrate(aggregate, stream)
