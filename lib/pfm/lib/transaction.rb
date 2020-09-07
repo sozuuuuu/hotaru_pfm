@@ -2,12 +2,16 @@ require 'money'
 
 module PFM
   class Transaction
+    class DuplicatedTransactionError < StandardError; end
+
     def initialize(id)
       @id = id
       @amount = Money.new(amount: 0.0)
     end
 
     def add(amount, description, account_from, account_to, datetime)
+      raise DuplicatedTransactionError if @state == :created
+
       apply TransactionAdded.new(data: { transaction_id: @id,
                                          amount: amount,
                                          description: description,
@@ -33,6 +37,8 @@ module PFM
       "#{self.class}$#{@id}"
     end
 
-    def on_transaction_added(_event); end
+    def on_transaction_added(_event)
+      @state = :created
+    end
   end
 end
