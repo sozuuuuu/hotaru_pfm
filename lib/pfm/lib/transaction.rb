@@ -2,10 +2,9 @@ require 'money'
 
 module PFM
   class Transaction
-    def initialize(id, event_store:)
+    def initialize(id)
       @id = id
       @amount = Money.new(amount: 0.0)
-      @event_store = event_store
     end
 
     def add(amount, description, account_from, account_to, datetime)
@@ -27,7 +26,7 @@ module PFM
         raise UnhandledEventError, event
       end
 
-      @event_store.publish(event, stream_name: stream_name)
+      event
     end
 
     def stream_name
