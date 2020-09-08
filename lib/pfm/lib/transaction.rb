@@ -1,6 +1,8 @@
+require 'money'
+
 module PFM
   class Transaction
-    include AggregateRoot
+    class DuplicatedTransactionError < StandardError; end
 
     def initialize(id)
       @id = id
@@ -8,20 +10,35 @@ module PFM
     end
 
     def add(amount, description, account_from, account_to, datetime)
+      raise DuplicatedTransactionError if @state == :created
+
       apply TransactionAdded.new(data: { transaction_id: @id,
                                          amount: amount,
                                          description: description,
                                          account_from: account_from,
                                          account_to: account_to,
-                                         datetime: datetime})
+                                         datetime: datetime })
     end
 
-    on TransactionAdded do |event|
-      @amount = Money.new(amount: event.data[:amount])
-      @description = event.data[:description]
-      @account_from = event.data[:account_from]
-      @account_to = event.data[:account_to]
-      @datetime = event.data[:datetime]
+    class UnhandledEventError < StandardError; end
+
+    def apply(event)
+      case event
+      when TransactionAdded
+        on_transaction_added(event)
+      else
+        raise UnhandledEventError, event
+      end
+
+      event
+    end
+
+    def stream_name
+      "#{self.class}$#{@id}"
+    end
+
+    def on_transaction_added(_event)
+      @state = :created
     end
   end
 end
